@@ -1,0 +1,90 @@
+<?php
+
+header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json');
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    if ($method === 'OPTIONS') {
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
+        exit();
+    }
+
+require_once 'Database.php';
+
+class AuthorsController {
+    private $conn;
+
+    public function __construct() {
+        $database = new Database();
+        $this->conn = $database->getConnection();
+    }
+
+    // Get all authors
+    public function getAllAuthors() {
+        $query = "SELECT * FROM authors";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        $authors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return json_encode($authors);
+    }
+
+    // Get author by ID
+    public function getAuthorById($id) {
+        $query = "SELECT * FROM authors WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        $author = $stmt->fetch(PDO::FETCH_ASSOC);
+        return json_encode($author);
+    }
+
+    // Create a new author
+    public function createAuthor($author) {
+        $query = "INSERT INTO authors (author) VALUES (:author)";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':author', $author);
+
+        if ($stmt->execute()) {
+            return json_encode(array("message" => "Author created successfully"));
+        } else {
+            return json_encode(array("message" => "Unable to create author"));
+        }
+    }
+
+    // Update an author
+    public function updateAuthor($id, $author) {
+        $query = "UPDATE authors SET author = :author WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':author', $author);
+        $stmt->bindParam(':id', $id);
+
+        if ($stmt->execute()) {
+            return json_encode(array("message" => "Author updated successfully"));
+        } else {
+            return json_encode(array("message" => "Unable to update author"));
+        }
+    }
+
+    // Delete an author
+    public function deleteAuthor($id) {
+        $query = "DELETE FROM authors WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+
+        if ($stmt->execute()) {
+            return json_encode(array("message" => "Author deleted successfully"));
+        } else {
+            return json_encode(array("message" => "Unable to delete author"));
+        }
+    }
+}
+
+?>

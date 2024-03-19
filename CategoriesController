@@ -1,0 +1,90 @@
+<?php
+
+header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json');
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    if ($method === 'OPTIONS') {
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
+        exit();
+    }
+
+require_once 'Database.php';
+
+class CategoriesController {
+    private $conn;
+
+    public function __construct() {
+        $database = new Database();
+        $this->conn = $database->getConnection();
+    }
+
+    // Get all categories
+    public function getAllCategories() {
+        $query = "SELECT * FROM categories";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return json_encode($categories);
+    }
+
+    // Get category by ID
+    public function getCategoryById($id) {
+        $query = "SELECT * FROM categories WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        $category = $stmt->fetch(PDO::FETCH_ASSOC);
+        return json_encode($category);
+    }
+
+    // Create a new category
+    public function createCategory($category) {
+        $query = "INSERT INTO categories (category) VALUES (:category)";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':category', $category);
+
+        if ($stmt->execute()) {
+            return json_encode(array("message" => "Category created successfully"));
+        } else {
+            return json_encode(array("message" => "Unable to create category"));
+        }
+    }
+
+    // Update a category
+    public function updateCategory($id, $category) {
+        $query = "UPDATE categories SET category = :category WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':category', $category);
+        $stmt->bindParam(':id', $id);
+
+        if ($stmt->execute()) {
+            return json_encode(array("message" => "Category updated successfully"));
+        } else {
+            return json_encode(array("message" => "Unable to update category"));
+        }
+    }
+
+    // Delete a category
+    public function deleteCategory($id) {
+        $query = "DELETE FROM categories WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+
+        if ($stmt->execute()) {
+            return json_encode(array("message" => "Category deleted successfully"));
+        } else {
+            return json_encode(array("message" => "Unable to delete category"));
+        }
+    }
+}
+
+?>

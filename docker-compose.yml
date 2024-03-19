@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  php-apache:
+    image: php:8.2-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fhsu653
+      POSTGRES_DB: quotesdb
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
