@@ -17,7 +17,7 @@ This project is a PHP OOP REST API for managing quotations. It allows users to p
 ## Setup
 1. Create a MySQL database named `quotesdb`
 2. Run the SQL schema script provided in `db_schema.sql`
-3. Update database credentials in `index.php`
+3. Update database credentials in `database.php`
 4. Start the PHP server and access the API using the provided endpoints
 
 ## Author
