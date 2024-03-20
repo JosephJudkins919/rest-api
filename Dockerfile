@@ -13,7 +13,7 @@ WORKDIR /var/www/html
 # Copy current directory contents into container
 COPY . /var/www/html
 
-# Adding Postgres support:
+# Adding Postgres support
 RUN docker-php-ext-install pdo_pgsql
 
 # Copy Apache configuration
