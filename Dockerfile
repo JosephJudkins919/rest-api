@@ -1,27 +1,27 @@
-# Use an official PHP runtime as a parent image
+# Use PHP runtime as a parent image
 FROM php:8.2-apache
 
-# Install required system packages and dependencies
+# Install required system packages
 RUN sed -i 's/deb.debian.org/mirrors.ubuntu.com/mirrors.ubuntu.com/g' /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Set the working directory in the container
+# Set working directory in container
 WORKDIR /var/www/html
 
-# Copy the current directory contents into the container at /var/www/html
+# Copy current directory contents into container
 COPY . /var/www/html
 
 # Adding Postgres support:
 RUN docker-php-ext-install pdo_pgsql
 
-# Copy custom Apache configuration
+# Copy Apache configuration
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Enable Apache modules
 RUN a2enmod rewrite
 
-# Expose port 80 to allow incoming connections to the container
+# Expose port 80 to allow connections
 EXPOSE 80
 
