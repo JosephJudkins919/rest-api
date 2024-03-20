@@ -1,14 +1,14 @@
 <?php
 
 header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
-    $method = $_SERVER['REQUEST_METHOD'];
+header('Content-Type: application/json');
+$method = $_SERVER['REQUEST_METHOD'];
 
-    if ($method === 'OPTIONS') {
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-        header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
-        exit();
-    }
+if ($method === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
+    exit();
+}
 
 require_once 'Database.php';
 
@@ -25,7 +25,8 @@ class QuotesController {
         $query = "SELECT q.id, q.quote, a.author, c.category
             FROM quotes q
             INNER JOIN authors a ON q.author_id = a.id
-            INNER JOIN categories c ON q.category_id = c.id";
+            INNER JOIN categories c ON q.category_id = c.id
+            LIMIT 25";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -47,7 +48,73 @@ class QuotesController {
         $stmt->execute();
 
         $quote = $stmt->fetch(PDO::FETCH_ASSOC);
-        return json_encode($quote);
+        if ($quote) {
+            return json_encode($quote);
+        } else {
+            return json_encode(array("message" => "No Quote Found"));
+        }
+    }
+
+    // Get quotes by author ID
+    public function getQuotesByAuthor($author_id) {
+        $query = "SELECT q.id, q.quote, a.author, c.category
+            FROM quotes q
+            INNER JOIN authors a ON q.author_id = a.id
+            INNER JOIN categories c ON q.category_id = c.id
+            WHERE q.author_id = :author_id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':author_id', $author_id);
+        $stmt->execute();
+
+        $quotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($quotes) {
+            return json_encode($quotes);
+        } else {
+            return json_encode(array("message" => "No Quotes Found for this Author"));
+        }
+    }
+
+    // Get quotes by category ID
+    public function getQuotesByCategory($category_id) {
+        $query = "SELECT q.id, q.quote, a.author, c.category
+            FROM quotes q
+            INNER JOIN authors a ON q.author_id = a.id
+            INNER JOIN categories c ON q.category_id = c.id
+            WHERE q.category_id = :category_id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':category_id', $category_id);
+        $stmt->execute();
+
+        $quotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($quotes) {
+            return json_encode($quotes);
+        } else {
+            return json_encode(array("message" => "No Quotes Found for this Category"));
+        }
+    }
+
+    // Get quotes by author ID and category ID
+    public function getQuotesByAuthorAndCategory($author_id, $category_id) {
+        $query = "SELECT q.id, q.quote, a.author, c.category
+            FROM quotes q
+            INNER JOIN authors a ON q.author_id = a.id
+            INNER JOIN categories c ON q.category_id = c.id
+            WHERE q.author_id = :author_id AND q.category_id = :category_id
+            LIMIT 2";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':author_id', $author_id);
+        $stmt->bindParam(':category_id', $category_id);
+        $stmt->execute();
+
+        $quotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($quotes) {
+            return json_encode($quotes);
+        } else {
+            return json_encode(array("message" => "No Quotes Found for this Author and Category"));
+        }
     }
 
     // Create a new quote
@@ -99,5 +166,4 @@ class QuotesController {
         }
     }
 }
-
 ?>

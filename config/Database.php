@@ -4,7 +4,7 @@ class Database {
     // Define database connection parameters
     private $host = 'localhost';
     private $db_name = 'quotesdb';
-    private $username = 'your_username';
+    private $username = 'Postgres';
     private $password = 'fhsu653';
     private $conn;
 
